@@ -9,7 +9,8 @@ class TownMapTest extends FlatSpec with Matchers {
     val someTrack: Option[Track] = Some(expectedTrack)
     val townMap: TownMap = TownMap(expectedTrack)
 
-    townMap.towns should contain (("A", Seq(expectedTrack)))
+    townMap.towns should contain (("A", List(expectedTrack)))
+    townMap.towns should contain (("B", List()))
     townMap.towns.getOrElse("A", fail("no town found")) should contain (expectedTrack)
   }
 
@@ -27,7 +28,7 @@ class TownMapTest extends FlatSpec with Matchers {
     val secondTrack: Track = Track("AB2")
     val townMap: TownMap = TownMap(firstTrack, secondTrack)
 
-    townMap.towns.size should be (1)
+    townMap.towns.size should be (2)
   }
 
   it should "turn down same Tracks with different length" in {
