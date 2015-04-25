@@ -11,4 +11,11 @@ class TrackTest extends FlatSpec with Matchers {
     track.end shouldBe "B"
     track.length shouldBe 5
   }
+
+  it should "throw an exception if the Track String doesn't match [A-Z][A-Z]\\d+" in {
+    an [IllegalArgumentException] should be thrownBy Track("")
+    an [IllegalArgumentException] should be thrownBy Track("AB")
+    an [IllegalArgumentException] should be thrownBy Track("A2")
+    an [IllegalArgumentException] should be thrownBy Track("ABC2")
+  }
 }
