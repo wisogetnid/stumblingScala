@@ -1,6 +1,8 @@
 package fp
 
-object Calculator {
+object Recursion {
+  def isSorted[A](array: Array[A], intOrder: (A, A) => Boolean) = ???
+
   def fib(n: Int): Int = {
     if (n <= 1)
       n
