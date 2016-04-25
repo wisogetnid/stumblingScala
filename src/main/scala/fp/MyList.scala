@@ -44,4 +44,21 @@ object MyList {
       MyNil
     else
       Cons(as.head, apply(as.tail: _*))
+
+  def foldRight[A,B](as: MyList[A], z: B)(f: (A, B) => B): B = as match {
+    case MyNil => z
+    case Cons(h, t) => f(h, foldRight(t, z)(f))
+  }
+
+  def foldLeft[A,B](as: MyList[A], z: B)(f: (B, A) => B): B = as match {
+    case MyNil => z
+    case Cons(h, t) => foldLeft(t, f(z, h))(f)
+  }
+
+  def append[A](as: MyList[A], bs: MyList[A]): MyList[A] = foldRight(as, bs)(Cons(_, _))
+
+  def flatten[A](list: MyList[MyList[A]]): MyList[A] = list match {
+    case MyNil => MyNil
+    case Cons(h, t) => foldLeft(t, h)(append)
+  }
 }
