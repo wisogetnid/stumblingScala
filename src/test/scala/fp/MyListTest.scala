@@ -80,4 +80,24 @@ class MyListTest extends FlatSpec with Matchers {
   "flatten" should "append a list of lists to one list" in {
     MyList.flatten(MyList(MyList(1,2,3), MyList(4,5,6), MyList(7,8,9))) shouldBe MyList(1,2,3,4,5,6,7,8,9)
   }
+
+  "oneAdder" should "add 1 to each value of a list" in {
+    MyList.oneAdder(list) shouldBe MyList(2,3,4)
+  }
+
+  "typeChanger" should "change type from Double into String" in {
+    MyList.typeChanger(MyList(1.0, 2.0, 3.0)) shouldBe MyList("1.0", "2.0", "3.0")
+  }
+
+  "map" should "provide easy way to implement oneAdder" in {
+    MyList.map(list)(_ + 1) shouldBe MyList(2,3,4)
+  }
+
+  it should "provide easy way to implement typeChanger" in {
+    MyList.map(MyList(1.0, 2.0, 3.0))(_.toString) shouldBe MyList("1.0", "2.0", "3.0")
+  }
+
+  "filter" should "remove items not matching a predicate" in {
+    MyList.filter(list)(_ % 2 == 0) shouldBe MyList(1,3)
+  }
 }

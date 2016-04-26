@@ -39,6 +39,23 @@ case class Cons[A](head: A, tail: MyList[A]) extends MyList[A] {
 }
 
 object MyList {
+  def filter[A](as: MyList[A])(f: A => Boolean): MyList[A] = ???
+
+  def map[A,B](as: MyList[A])(f: A => B): MyList[B] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => Cons(f(h), map(t)(f))
+  }
+
+  def typeChanger(as: MyList[Double]): MyList[String] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => Cons(h.toString, typeChanger(t))
+  }
+
+  def oneAdder(as: MyList[Int]): MyList[Int] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => Cons(h + 1, oneAdder(t))
+  }
+
   def apply[A](as: A*): MyList[A] =
     if (as.isEmpty)
       MyNil
