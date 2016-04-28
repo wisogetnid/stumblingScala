@@ -98,6 +98,35 @@ class MyListTest extends FlatSpec with Matchers {
   }
 
   "filter" should "remove items not matching a predicate" in {
-    MyList.filter(list)(_ % 2 == 0) shouldBe MyList(1,3)
+    MyList.filter(list)(_ % 2 == 1) shouldBe MyList(1,3)
+  }
+
+  "flatMap" should "execute a function returning a list over every element of a list" in {
+    MyList.flatMap(list)(e => MyList(e, e)) shouldBe MyList(1,1,2,2,3,3)
+  }
+
+  "flatMapFilter" should "do the same as filter(remove items not matching a predicate)" in {
+    MyList.flatMapFilter(list)(_ % 2 == 1) shouldBe MyList(1,3)
+  }
+
+  "zipWith" should "merge two lists using a function" in {
+    MyList.zipWith(list, list)(_ + _) shouldBe MyList(2,4,6)
+  }
+
+  it should "merge two different sized lists using a function" in {
+    MyList.zipWith(list, MyList(3))(_ + _) shouldBe MyList(4,2,3)
+    MyList.zipWith(list, MyList(3, 3, 3, 3))(_ + _) shouldBe MyList(4, 5, 6, 3)
+  }
+
+  "hasSubsequence" should "find subsequences within a sequence" in {
+    MyList.hasSubsequence(list, MyList(2)) shouldBe true
+  }
+
+  it should "find complex subsequences" in {
+    MyList.hasSubsequence(MyList(1,3,1,2,3,2,3), list) shouldBe true
+  }
+  
+  it should "return false if the subsequence could not be found" in {
+    MyList.hasSubsequence(list, MyList(4)) shouldBe false
   }
 }

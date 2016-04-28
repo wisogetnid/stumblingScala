@@ -39,7 +39,29 @@ case class Cons[A](head: A, tail: MyList[A]) extends MyList[A] {
 }
 
 object MyList {
-  def filter[A](as: MyList[A])(f: A => Boolean): MyList[A] = ???
+  def hasSubsequence[A](as: MyList[A], sub: MyList[A]): Boolean = ???
+
+  def zipWith[A](as: MyList[A], bs: MyList[A])(f: (A, A) => A): MyList[A] = (as, bs) match {
+    case (MyNil, MyNil) => MyNil
+    case (MyNil, Cons(h, t)) => Cons(h, zipWith(MyNil, t)(f))
+    case (Cons(h, t), MyNil) => Cons(h, zipWith(t, MyNil)(f))
+    case (Cons(ha, ta), Cons(hb, tb)) => Cons(f(ha, hb), zipWith(ta, tb)(f))
+  }
+
+  def flatMapFilter[A](as: MyList[A])(f: A => Boolean): MyList[A] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => flatMap(as)(a => if(f(a)) MyList(a) else MyNil)
+  }
+
+  def flatMap[A,B](as: MyList[A])(f: A => MyList[B]): MyList[B] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => MyList.append(f(h), flatMap(t)(f))
+  }
+
+  def filter[A](as: MyList[A])(f: A => Boolean): MyList[A] = as match {
+    case MyNil => MyNil
+    case Cons(h, t) => if (f(h)) Cons(h, filter(t)(f)) else filter(t)(f)
+  }
 
   def map[A,B](as: MyList[A])(f: A => B): MyList[B] = as match {
     case MyNil => MyNil
