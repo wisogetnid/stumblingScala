@@ -122,10 +122,18 @@ class MyListTest extends FlatSpec with Matchers {
     MyList.hasSubsequence(list, MyList(2)) shouldBe true
   }
 
-  it should "find complex subsequences" in {
-    MyList.hasSubsequence(MyList(1,3,1,2,3,2,3), list) shouldBe true
+  it should "find subsequence at the beginning" in {
+    MyList.hasSubsequence(MyList(1,2,3,2,1,3), list) shouldBe true
   }
-  
+
+  it should "find subsequence in the middle" in {
+    MyList.hasSubsequence(MyList(1,1,2,3,2,3), list) shouldBe true
+  }
+
+  it should "find subsequence in the end" in {
+    MyList.hasSubsequence(MyList(1,3,2,1,2,3), list) shouldBe true
+  }
+
   it should "return false if the subsequence could not be found" in {
     MyList.hasSubsequence(list, MyList(4)) shouldBe false
   }

@@ -39,7 +39,21 @@ case class Cons[A](head: A, tail: MyList[A]) extends MyList[A] {
 }
 
 object MyList {
-  def hasSubsequence[A](as: MyList[A], sub: MyList[A]): Boolean = ???
+  def hasSubsequence[A](as: MyList[A], sub: MyList[A]): Boolean = {
+    def go(bs: MyList[A], bSub: MyList[A]): Boolean = (bs, bSub) match {
+      case (_, MyNil) => true
+      case (MyNil, _) => false
+      case (Cons(h, t), Cons(hSub, tSub)) =>
+        if (h == hSub)
+          go(t, tSub)
+        else if (sub == bSub)
+          go(t, sub)
+        else
+          go(Cons(h, t), sub)
+    }
+
+    go(as, sub)
+  }
 
   def zipWith[A](as: MyList[A], bs: MyList[A])(f: (A, A) => A): MyList[A] = (as, bs) match {
     case (MyNil, MyNil) => MyNil
