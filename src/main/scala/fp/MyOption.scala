@@ -18,6 +18,23 @@ sealed trait MyOption[+A] {
   def filter(predicate: A => Boolean): MyOption[A] = this.flatMap(a => if (predicate(a)) MySome(a) else MyNone)
 }
 
+object MyOption {
+  def traverse[A,B](as: List[A])(f: A => Option[B]): Option[List[B]] =
+    as.foldRight(Some(Nil): Option[List[B]])((op: A, maybeAccu: Option[List[B]]) => f(op) match {
+      case None => None
+      case Some(value) => maybeAccu.map( value :: _ )
+  })
+
+  def sequence[A](maybeAs: List[MyOption[A]]): MyOption[List[A]] =
+    maybeAs.foldRight(MySome(Nil): MyOption[List[A]])((maybeOp: MyOption[A], maybeAccu: MyOption[List[A]]) => maybeOp match {
+      case MyNone => MyNone
+      case MySome(value) => maybeAccu.map( value :: _ )
+    })
+
+  def map2[A,B,C](maybeA: MyOption[A], maybeB: MyOption[B])(f: (A,B) => C): MyOption[C] =
+    maybeA.flatMap(a => maybeB.map(b => f(a, b)))
+}
+
 case object MyNone extends MyOption[Nothing]
 
 case class MySome[+A](get: A) extends MyOption[A]
