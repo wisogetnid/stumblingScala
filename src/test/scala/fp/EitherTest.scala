@@ -2,6 +2,8 @@ package fp
 
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util.Try
+
 class EitherTest extends FlatSpec with Matchers {
 
   "map" should "perform a function on the right value" in {
@@ -51,4 +53,26 @@ class EitherTest extends FlatSpec with Matchers {
     right.map2(left)(_ + _) shouldBe MyLeft("sad")
     left.map2(right)(_ + _) shouldBe MyLeft("sad")
   }
+
+  "sequence" should "transform a list of eithers in either a list on all rights" in {
+    val rights: List[MyEither[Nothing, Int]] = List(MyRight(1), MyRight(2), MyRight(3))
+    MyEither.sequence(rights) shouldBe MyRight(List(1, 2, 3))
+  }
+
+  it should "return a left if there is a left in the list" in {
+    val leftAndRights: List[MyEither[String, Int]] = List(MyRight(1), MyLeft("zwoa"), MyRight(3))
+    MyEither.sequence(leftAndRights) shouldBe MyLeft("zwoa")
+  }
+
+  "traverse" should "apply a function on a list of eithers and return an either of a list if all is successful" in {
+    val rights = List(2, 4, 6)
+    MyEither.traverse(rights)(divider) shouldBe MyRight(List(1, 2, 3))
+  }
+
+  it should "return a left if the application of the function leads to a left" in {
+    val leftAndRights = List(2, 4, 5)
+    MyEither.traverse(leftAndRights)(divider) shouldBe MyLeft("boum")
+  }
+
+  private def divider(a: Int): MyEither[String, Int] = if (a % 2 == 0) MyRight(a / 2) else MyLeft("boum")
 }
