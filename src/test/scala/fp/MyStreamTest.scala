@@ -64,4 +64,31 @@ class MyStreamTest extends FlatSpec with Matchers {
     val wordStream = MyStream("bob", "eve")
     wordStream.flatMap(a => MyStream(a.split(""): _*)).toList shouldBe List("b", "o", "b", "e", "v", "e")
   }
+
+  "uMap" should "behave like map but be implemented using unfold" in {
+    stream.uMap(_ + 1).toList shouldBe List(2, 3, 4)
+  }
+
+  "uTake" should "behave like take but be implemented using unfold" in {
+    stream.uTake(2).toList shouldBe List(1, 2)
+  }
+
+  "uTakeWhile" should "behave like takeWhile but be implemented using unfold" in {
+    val stream = MyStream(1, 3, 4, 5)
+    stream.uTakeWhile(_ % 2 == 1).toList shouldBe List(1, 3)
+  }
+
+  "zipWith" should "merge two streams using a function" in {
+    stream.zipWith(stream)(_ + _).toList shouldBe List(2, 4, 6)
+  }
+
+  "zipAll" should "merge two streams creating tuples" in {
+    stream.zipAll(stream).toList shouldBe List((Some(1), Some(1)), (Some(2), Some(2)), (Some(3), Some(3)))
+  }
+
+  it should "add spare elements with a None as second tuple element" in {
+    stream.zipAll(MyStream(1)).toList shouldBe List((Some(1), Some(1)), (Some(2), None), (Some(3), None))
+    MyStream(1).zipAll(stream).toList shouldBe List((Some(1), Some(1)), (None, Some(2)), (None, Some(3)))
+  }
+
 }

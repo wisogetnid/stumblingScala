@@ -47,6 +47,33 @@ sealed trait MyStream[+A] {
     case MyEmpty => List()
     case MyCons(h, t) => h() :: t().toList
   }
+
+  def uMap[B](f: A => B): MyStream[B] = MyStream.unfold(this) {
+    case MyCons(h, t) => Some(f(h()), t())
+    case _ => None
+  }
+
+  def uTake(n: Int): MyStream[A] = MyStream.unfold((n, this)) {
+    case (n:Int, MyCons(h, t)) if n > 0 => Some(h(), (n-1, t()))
+    case _ => None
+  }
+
+  def uTakeWhile(f: A => Boolean): MyStream[A] = MyStream.unfold(this) {
+    case MyCons(h, t) if f(h()) => Some(h(), t())
+    case _ => None
+  }
+
+  def zipWith[B, C](bs: MyStream[B])(f: (A, B) => C): MyStream[C] = MyStream.unfold((this, bs)) {
+    case (MyCons(ha, ta), MyCons(hb, tb)) => Some(f(ha(), hb()), (ta(), tb()))
+    case _ => None
+  }
+
+  def zipAll[B](bs: MyStream[B]): MyStream[(Option[A], Option[B])] = MyStream.unfold((this, bs)) {
+    case (MyCons(ha, ta), MyCons(hb, tb)) => Some((Some(ha()), Some(hb())), (ta(), tb()))
+    case (MyCons(h, t), MyEmpty) => Some((Some(h()), None), (t(), empty))
+    case (MyEmpty, MyCons(h, t)) => Some((None, Some(h())), (empty, t()))
+    case _ => None
+  }
 }
 
 case object MyEmpty extends MyStream[Nothing]
