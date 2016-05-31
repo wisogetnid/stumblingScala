@@ -40,7 +40,7 @@ sealed trait MyStream[+A] {
 
   def take(n: Int): MyStream[A] = this match {
     case MyEmpty => MyEmpty
-    case MyCons(h, t) => if (n <= 0) MyEmpty else cons(h(), t().take(n - 1))
+    case MyCons(h, t) => if (n <= 0) empty else cons(h(), t().take(n - 1))
   }
 
   def toList: List[A] = this match {
@@ -54,6 +54,29 @@ case object MyEmpty extends MyStream[Nothing]
 case class MyCons[+A](h: () => A, t: () => MyStream[A]) extends MyStream[A]
 
 object MyStream {
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): MyStream[A] =
+    f(z) match {
+      case Some((a, s)) => cons(a, unfold(s)(f))
+      case _ => empty[A]
+    }
+
+  def fibonacci: MyStream[Int] = {
+    def go(i: Int, j: Int): MyStream[Int] = cons(i, go(j, i+j))
+    go(0, 1)
+  }
+
+//  def fibAdder(a: Int, s: Int) = Some((a, (s, a + s)))
+//  def uFibonacci: MyStream[Int] = unfold[Int, (Int, Int)]((0,1)){ fibAdder }
+  def uFibonacci: MyStream[Int] = unfold((0,1)){ x => Some(x._1, (x._2, x._1 + x._2)) }
+
+  def from(n: Int): MyStream[Int] = cons(n, from(n + 1))
+
+  def uFrom(n: Int): MyStream[Int] = unfold(n)(s => Some(s, s + 1))
+
+  def uConstant[A](a: A): MyStream[A] = unfold(a)(s => Some(a, a))
+
+  def constant[A](a: A): MyStream[A] = cons(a, constant(a))
+
   def cons[A](hd: => A, tl: => MyStream[A]): MyStream[A] = {
     lazy val head = hd
     lazy val tail = tl
