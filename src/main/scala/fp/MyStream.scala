@@ -74,6 +74,21 @@ sealed trait MyStream[+A] {
     case (MyEmpty, MyCons(h, t)) => Some((None, Some(h())), (empty, t()))
     case _ => None
   }
+
+  def startsWith[A](s: MyStream[A]): Boolean =
+    this.zipAll(s).uMap{
+      case (None, Some(_)) => false
+      case (Some(_), None) => true
+      case (None, None) => true
+      case (Some(a), Some(b)) => a == b
+    }.forAll(identity)
+
+  def tails: MyStream[MyStream[A]] = MyStream.unfold(this){
+    case MyCons(h, t) => Some(MyCons(h, t), t())
+    case _ => None
+  }.append(MyStream(MyStream()))
+
+  def scanRight[AA >: A](b: AA)(f: (A, => AA) => AA): MyStream[AA] = this.tails.map(_.foldRight(b)(f))
 }
 
 case object MyEmpty extends MyStream[Nothing]
@@ -92,8 +107,6 @@ object MyStream {
     go(0, 1)
   }
 
-//  def fibAdder(a: Int, s: Int) = Some((a, (s, a + s)))
-//  def uFibonacci: MyStream[Int] = unfold[Int, (Int, Int)]((0,1)){ fibAdder }
   def uFibonacci: MyStream[Int] = unfold((0,1)){ x => Some(x._1, (x._2, x._1 + x._2)) }
 
   def from(n: Int): MyStream[Int] = cons(n, from(n + 1))

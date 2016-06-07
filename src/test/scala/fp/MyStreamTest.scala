@@ -91,4 +91,23 @@ class MyStreamTest extends FlatSpec with Matchers {
     MyStream(1).zipAll(stream).toList shouldBe List((Some(1), Some(1)), (None, Some(2)), (None, Some(3)))
   }
 
+  "startsWith" should "return trye if a stream starts with another stream" in {
+    stream.startsWith(MyStream(1, 2)) shouldBe true
+  }
+
+  it should "return false if the compared stream isn't the start sequence" in {
+    stream.startsWith(MyStream(2, 3)) shouldBe false
+  }
+
+  it should "return false if the compared stream is too long" in {
+    stream.startsWith(MyStream(1, 2, 3, 4)) shouldBe false
+  }
+
+  "tails" should "split up a stream in many streams of tails" in {
+    stream.tails.map(_.toList).toList shouldBe List(List(1, 2, 3), List(2, 3), List(3), List())
+  }
+
+  "scanRight" should "create a stream of tail streams while executing a function over it" in {
+    stream.scanRight(1)(_ + _).toList shouldBe List(7, 6, 4, 1)
+  }
 }
